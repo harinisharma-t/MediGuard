@@ -65,3 +65,12 @@ MediGuard needs reliable and standardized medication information. RxNorm is usef
 Using multiple sources also reduces dependence on a single dataset and allows the system to combine standardized drug information with safety-related information.
 
 For this academic prototype, publicly accessible sources are preferred so that the project can be developed and demonstrated without relying on restricted commercial datasets.
+## Drug Allergy Data Decision
+
+A clean public dataset specifically representing confirmed patient drug allergies was not identified for the initial prototype.
+
+Public pharmacovigilance sources contain adverse drug reaction reports, but an adverse reaction should not automatically be interpreted as a confirmed drug allergy.
+
+Therefore, MediGuard will initially use a small, clearly documented allergy mapping for prototype testing. This mapping will be treated as demonstration data rather than real patient data.
+
+Future versions could integrate a properly licensed clinical terminology or allergy knowledge source.
