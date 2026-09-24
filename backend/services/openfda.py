@@ -3,7 +3,7 @@ import requests
 OPENFDA_URL = "https://api.fda.gov/drug/label.json"
 
 
-def test_openfda_connection():
+def explore_openfda():
     params = {
         "limit": 1
     }
@@ -15,12 +15,39 @@ def test_openfda_connection():
 
 
 if __name__ == "__main__":
-    data = test_openfda_connection()
+    data = explore_openfda()
 
-    print("OpenFDA connection successful.")
-    print("Records received:", len(data.get("results", [])))
+    print("OpenFDA data exploration")
+    print("=" * 30)
 
-    if data.get("results"):
-        record = data["results"][0]
-        print("Example drug:", record.get("openfda", {}).get("brand_name", ["Unknown"])[0])
-        
+    results = data.get("results", [])
+
+    if results:
+        drug = results[0]
+
+        print("\nAvailable fields:")
+        for field in drug.keys():
+            print("-", field)
+
+        print("\nOpenFDA identification fields:")
+        openfda = drug.get("openfda", {})
+
+        for field, value in openfda.items():
+            print(f"{field}: {value}")
+
+        print("\nUseful MediGuard fields:")
+        for field in [
+            "active_ingredient",
+            "drug_interactions",
+            "contraindications",
+            "warnings",
+            "precautions",
+        ]:
+            value = drug.get(field)
+
+            if value:
+                print(f"\n{field}:")
+                print(str(value)[:500])
+
+    else:
+        print("No records returned.")

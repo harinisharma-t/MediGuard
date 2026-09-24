@@ -19,12 +19,25 @@ if __name__ == "__main__":
 
     data = search_drug(drug_name)
 
-    print("RxNorm connection successful.")
+    print("RxNorm data exploration")
+    print("=" * 30)
     print("Search term:", drug_name)
 
     groups = data.get("drugGroup", {}).get("conceptGroup", [])
 
     if groups:
-        print("RxNorm returned drug information.")
+        print("\nRxNorm returned the following information:")
+
+        for group in groups:
+            print("\nTerm type:", group.get("tty"))
+
+            concepts = group.get("conceptProperties", [])
+
+            for concept in concepts[:5]:
+                print(
+                    f"RXCUI: {concept.get('rxcui')} | "
+                    f"Name: {concept.get('name')} | "
+                    f"TTY: {concept.get('tty')}"
+                )
     else:
         print("No drug information found.")
