@@ -74,3 +74,40 @@ Public pharmacovigilance sources contain adverse drug reaction reports, but an a
 Therefore, MediGuard will initially use a small, clearly documented allergy mapping for prototype testing. This mapping will be treated as demonstration data rather than real patient data.
 
 Future versions could integrate a properly licensed clinical terminology or allergy knowledge source.
+## Data Exploration and Schema Decisions
+
+### OpenFDA Fields
+
+The OpenFDA drug label data can provide several fields relevant to MediGuard:
+
+- `openfda` - standardized identification information when available.
+- `active_ingredient` - active ingredient information.
+- `drug_interactions` - interaction information included in the drug label.
+- `contraindications` - situations where the drug should not be used.
+- `warnings` - important safety warnings.
+- `precautions` - additional safety information.
+
+### RxNorm Fields
+
+RxNorm provides standardized medication information including:
+
+- `rxcui` - unique RxNorm concept identifier.
+- `name` - standardized medication name.
+- `tty` - term type describing the type of medication concept.
+
+### Planned MediGuard Internal Data
+
+The initial internal representation will focus on:
+
+| Field | Purpose |
+|---|---|
+| drug_name | User-facing medication name |
+| normalized_name | Standardized medication name |
+| rxcui | RxNorm identifier |
+| active_ingredient | Active ingredient of the medication |
+| interaction_pair | Two medications involved in an interaction |
+| severity | Interaction severity category |
+| allergy_class | Allergy/ingredient class used for allergy checking |
+| source | Source of the medication or safety information |
+
+The project will use standardized drug names and identifiers where possible so that brand names, generic names, and variations in user input can be mapped to a consistent medication representation.
