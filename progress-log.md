@@ -18,3 +18,8 @@
 - Explored OpenFDA drug-label fields and RxNorm standardized medication fields using the existing API connection scripts.
 - Identified the medication, interaction, safety, and identification fields required by the MediGuard prototype.
 - Documented the initial internal data schema for normalized drugs, interactions, severity, and allergy information.
+
+## Day 5
+- Built an OpenFDA data collection pipeline that retrieves drug-label records in batches.
+- Extracted medication names, active ingredients, interaction information, contraindications, warnings, and precautions.
+- Collected a small working dataset for the next stages of MediGuard data processing.
