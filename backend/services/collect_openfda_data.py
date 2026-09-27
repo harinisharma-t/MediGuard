@@ -1,3 +1,4 @@
+from copy import error
 import json
 from pathlib import Path
 
@@ -24,13 +25,19 @@ def collect_openfda_data(limit=10):
             "skip": skip,
         }
 
-        response = requests.get(
-            OPENFDA_URL,
-            params=params,
-            timeout=15,
-        )
+        try:
+            response = requests.get(
+                OPENFDA_URL,
+                params=params,
+                timeout=15,
+            )
+            response.raise_for_status()
+        except requests.RequestException as error:
+            print(f"OpenFDA request failed: {error}")
+            break
 
-        response.raise_for_status()
+        data = response.json()
+        results = data.get("results", [])
 
         data = response.json()
         results = data.get("results", [])
