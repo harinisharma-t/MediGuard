@@ -72,14 +72,44 @@ def save_data(records):
             indent=4,
             ensure_ascii=False,
         )
+def validate_records(records):
+    required_fields = [
+        "brand_name",
+        "generic_name",
+        "substance_name",
+        "active_ingredient",
+        "drug_interactions",
+        "contraindications",
+        "warnings",
+        "precautions",
+    ]
 
+    for index, record in enumerate(records, start=1):
+        missing_fields = [
+            field for field in required_fields
+            if field not in record
+        ]
+
+        if missing_fields:
+            print(
+                f"Record {index} is missing fields: "
+                f"{missing_fields}"
+            )
+            return False
+
+    return True
 
 if __name__ == "__main__":
     print("Starting OpenFDA data collection...")
 
     records = collect_openfda_data(limit=10)
 
-    save_data(records)
+    if validate_records(records):
+        print("Data validation successful.")
+        save_data(records)
+    else:
+        print("Data validation failed.")
+        raise SystemExit(1)
 
     print("Data collection completed.")
     print("Records collected:", len(records))
