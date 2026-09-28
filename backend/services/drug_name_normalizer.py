@@ -43,13 +43,20 @@ def build_drug_name_mapping(records):
 
 
 if __name__ == "__main__":
-    example_names = [
-        " Warfarin ",
-        "WARFARIN",
-        "warfarin   sodium",
-    ]
+    import json
+    from pathlib import Path
 
-    print("Drug name normalization examples:")
+    project_root = Path(__file__).resolve().parents[2]
+    data_file = project_root / "data" / "openfda_drug_labels.json"
 
-    for name in example_names:
-        print(f"{name!r} -> {normalize_drug_name(name)!r}")
+    with open(data_file, "r", encoding="utf-8") as file:
+        records = json.load(file)
+
+    drug_mapping = build_drug_name_mapping(records)
+
+    print("Drug name normalization completed.")
+    print("Records processed:", len(records))
+    print("Brand-to-generic mappings:", len(drug_mapping))
+
+    for brand_name, generic_name in list(drug_mapping.items())[:5]:
+        print(f"{brand_name} -> {generic_name}")
