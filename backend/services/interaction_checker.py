@@ -114,11 +114,14 @@ if __name__ == "__main__":
         "naproxen",
         "povidone-iodine",
         "silicea",
+        "benzalkonium chloride",
     ]
 
     results = check_multiple_drugs(drugs)
 
     print("Multi-drug interaction check:")
+    print("Drugs checked:", len(drugs))
+    print("Pairs checked:", len(results))
 
     for result in results:
         print(
