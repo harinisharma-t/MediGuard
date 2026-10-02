@@ -79,13 +79,50 @@ def check_interaction(drug_a, drug_b):
         "severity": interaction[0],
         "description": interaction[1],
     }
+def check_multiple_drugs(drug_names):
+    """
+    Check all possible drug pairs from a list of drugs.
+    """
 
+    interaction_results = []
+
+    for first_index in range(len(drug_names)):
+        for second_index in range(
+            first_index + 1,
+            len(drug_names)
+        ):
+            first_drug = drug_names[first_index]
+            second_drug = drug_names[second_index]
+
+            result = check_interaction(
+                first_drug,
+                second_drug
+            )
+
+            interaction_results.append(
+                {
+                    "drug_a": first_drug,
+                    "drug_b": second_drug,
+                    "result": result,
+                }
+            )
+
+    return interaction_results
 
 if __name__ == "__main__":
-    result = check_interaction(
+    drugs = [
         "naproxen",
-        "povidone-iodine"
-    )
+        "povidone-iodine",
+        "silicea",
+    ]
 
-    print("Interaction check result:")
-    print(result)
+    results = check_multiple_drugs(drugs)
+
+    print("Multi-drug interaction check:")
+
+    for result in results:
+        print(
+            f"{result['drug_a']} + "
+            f"{result['drug_b']} -> "
+            f"{result['result']}"
+        )
