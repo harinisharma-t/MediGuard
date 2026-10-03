@@ -34,7 +34,8 @@ def find_drug(drug_name):
 
 def check_allergy(drug_name, allergen):
     """
-    Check whether a patient's allergen matches the selected drug.
+    Check whether a patient's allergen matches
+    the drug name, brand name, or active ingredient.
     """
 
     drug = find_drug(drug_name)
@@ -46,7 +47,6 @@ def check_allergy(drug_name, allergen):
             "message": "Drug was not found in the database."
         }
 
-    drug_id = drug[0]
     generic_name = drug[1]
     brand_name = drug[2]
     active_ingredient = drug[3]
@@ -64,6 +64,7 @@ def check_allergy(drug_name, allergen):
             return {
                 "found": True,
                 "allergy_risk": True,
+                "matched_information": information,
                 "message": (
                     f"Possible allergy match found for "
                     f"{drug_name} and {allergen}."
@@ -73,14 +74,13 @@ def check_allergy(drug_name, allergen):
     return {
         "found": True,
         "allergy_risk": False,
+        "matched_information": None,
         "message": "No allergy match found."
     }
-
-
 if __name__ == "__main__":
     result = check_allergy(
-        "naproxen",
-        "naproxen"
+        "Betadine",
+        "povidone-iodine"
     )
 
     print("Allergy check result:")
