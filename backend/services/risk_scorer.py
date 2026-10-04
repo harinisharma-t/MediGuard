@@ -43,10 +43,43 @@ def calculate_risk(interaction_severity=None, allergy_risk=False):
 
 
 if __name__ == "__main__":
-    result = calculate_risk(
-        interaction_severity="major",
-        allergy_risk=False
-    )
+    test_cases = [
+        {
+            "name": "High risk - allergy",
+            "interaction_severity": None,
+            "allergy_risk": True,
+        },
+        {
+            "name": "High risk - major interaction",
+            "interaction_severity": "major",
+            "allergy_risk": False,
+        },
+        {
+            "name": "Moderate risk",
+            "interaction_severity": "moderate",
+            "allergy_risk": False,
+        },
+        {
+            "name": "Low risk - minor interaction",
+            "interaction_severity": "minor",
+            "allergy_risk": False,
+        },
+        {
+            "name": "Low risk - no interaction",
+            "interaction_severity": None,
+            "allergy_risk": False,
+        },
+    ]
 
-    print("Risk scoring result:")
-    print(result)
+    print("Risk scoring verification:")
+
+    for test_case in test_cases:
+        result = calculate_risk(
+            interaction_severity=test_case["interaction_severity"],
+            allergy_risk=test_case["allergy_risk"],
+        )
+
+        print(
+            f"{test_case['name']} -> "
+            f"{result['risk_level']}"
+        )
