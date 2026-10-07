@@ -1,4 +1,4 @@
-from backend.services.interaction_checker import check_interaction
+from backend.core.interaction_checker import check_interaction
 from backend.services.allergy_checker import check_allergy
 
 
