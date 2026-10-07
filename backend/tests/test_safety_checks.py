@@ -1,5 +1,5 @@
 from backend.core.interaction_checker import check_interaction
-from backend.services.allergy_checker import check_allergy
+from backend.core.allergy_checker import check_allergy
 
 
 def test_interaction_checker_returns_no_interaction():
