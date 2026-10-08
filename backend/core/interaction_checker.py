@@ -1,6 +1,8 @@
 import sqlite3
 from pathlib import Path
 
+from backend.utils.logger import get_logger
+
 
 DATABASE_FILE = (
     Path(__file__).resolve().parents[2]
@@ -8,12 +10,13 @@ DATABASE_FILE = (
     / "mediguard.db"
 )
 
+logger = get_logger(__name__)
+
 
 def find_drug(drug_name):
     """
     Find a drug in the database using its generic or brand name.
     """
-
     connection = sqlite3.connect(DATABASE_FILE)
 
     drug = connection.execute(
@@ -36,11 +39,16 @@ def check_interaction(drug_a, drug_b):
     """
     Check whether an interaction exists between two drugs.
     """
-
     first_drug = find_drug(drug_a)
     second_drug = find_drug(drug_b)
 
     if not first_drug or not second_drug:
+        logger.warning(
+            "Drug lookup failed for: %s, %s",
+            drug_a,
+            drug_b,
+        )
+
         return {
             "found": False,
             "message": "One or both drugs were not found in the database."
@@ -69,21 +77,34 @@ def check_interaction(drug_a, drug_b):
     connection.close()
 
     if not interaction:
+        logger.info(
+            "No interaction found for: %s + %s",
+            drug_a,
+            drug_b,
+        )
+
         return {
             "found": False,
             "message": "No interaction found in the database."
         }
+
+    logger.info(
+        "Interaction found for: %s + %s",
+        drug_a,
+        drug_b,
+    )
 
     return {
         "found": True,
         "severity": interaction[0],
         "description": interaction[1],
     }
+
+
 def check_multiple_drugs(drug_names):
     """
     Check all possible drug pairs from a list of drugs.
     """
-
     interaction_results = []
 
     for first_index in range(len(drug_names)):
@@ -108,6 +129,7 @@ def check_multiple_drugs(drug_names):
             )
 
     return interaction_results
+
 
 if __name__ == "__main__":
     drugs = [
