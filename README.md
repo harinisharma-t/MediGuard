@@ -59,3 +59,41 @@ Engine                   |
              |
              v
      Safety-Focused Result
+
+## Current Implementation
+
+MediGuard currently includes:
+
+- OpenFDA drug-label data collection and JSON storage
+- RxNorm API connectivity
+- Drug-name normalization and fuzzy matching
+- SQLite database initialization and medication data loading
+- Drug interaction lookup and multi-drug pair checking
+- Allergy matching against medication names and active ingredients
+- Basic risk scoring
+- Logging and error handling
+- Automated tests using pytest
+
+## Project Architecture
+
+The project is organized into separate modules for data collection, core checking logic, database operations, testing, and logging.
+
+See [`docs/architecture.md`](docs/architecture.md) for the architecture diagram, module descriptions, database design, testing strategy, and current limitations.
+
+## Running Tests
+
+Activate the virtual environment in PowerShell if it is not already active:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+Run all automated tests:
+
+```powershell
+pytest backend/tests
+```
+
+## Safety Limitations
+
+MediGuard is an educational prototype, not a medical diagnosis or treatment tool. Its local interaction dataset is limited, and a missing interaction result does not establish that a medication combination is safe. Consult a qualified healthcare professional for medication and allergy concerns.
