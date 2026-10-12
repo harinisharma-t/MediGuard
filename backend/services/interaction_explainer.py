@@ -1,17 +1,31 @@
 
 def explain_interaction(interaction_result):
-    """Convert a drug interaction result into a readable explanation."""
+    """Convert interaction data into a readable, cautious explanation."""
 
     if not isinstance(interaction_result, dict):
         raise TypeError("interaction_result must be a dictionary.")
 
-    severity = str(
-        interaction_result.get("severity", "unknown")
-    ).strip().lower()
+    drug_a = interaction_result.get("drug_a")
+    drug_b = interaction_result.get("drug_b")
 
-    drug_a = interaction_result.get("drug_a", "Unknown drug")
-    drug_b = interaction_result.get("drug_b", "Unknown drug")
+    drug_a = str(drug_a).strip() if drug_a is not None else ""
+    drug_b = str(drug_b).strip() if drug_b is not None else ""
+
+    drug_a = drug_a or "Unknown drug"
+    drug_b = drug_b or "Unknown drug"
+
+    raw_severity = interaction_result.get("severity")
+    severity = (
+        str(raw_severity).strip().lower()
+        if raw_severity is not None
+        else ""
+    )
+
     description = interaction_result.get("description")
+    if description is not None and not isinstance(description, str):
+        raise TypeError("description must be a string or None.")
+
+    description = description.strip() if description else ""
 
     if severity in {"major", "contraindicated"}:
         risk_message = (
@@ -35,6 +49,7 @@ def explain_interaction(interaction_result):
             "This does not prove that taking these medicines together is safe."
         )
     else:
+        severity = "unknown"
         risk_message = (
             "The interaction risk cannot be determined from the available "
             "information. Consult a qualified healthcare professional."
