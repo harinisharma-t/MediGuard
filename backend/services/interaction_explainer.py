@@ -1,6 +1,6 @@
 
 def explain_interaction(interaction_result):
-    """Convert interaction data into a readable, cautious explanation."""
+    """Explain an interaction result without overstating the available evidence."""
 
     if not isinstance(interaction_result, dict):
         raise TypeError("interaction_result must be a dictionary.")
@@ -27,20 +27,39 @@ def explain_interaction(interaction_result):
 
     description = description.strip() if description else ""
 
-    if severity in {"major", "contraindicated"}:
+    evidence_status = str(
+        interaction_result.get("evidence_status", "unknown")
+    ).strip().lower()
+
+    if evidence_status not in {"reported", "not_found", "unknown"}:
+        evidence_status = "unknown"
+
+    if evidence_status == "not_found":
+        severity = "unknown"
         risk_message = (
-            "This result indicates a potentially serious interaction. "
+            "No interaction record was found in the available database. "
+            "This does not establish that the medicines are safe to use together."
+        )
+    elif evidence_status == "unknown":
+        severity = "unknown"
+        risk_message = (
+            "There is insufficient evidence in this result to determine "
+            "the interaction risk. Consult a qualified healthcare professional."
+        )
+    elif severity in {"major", "contraindicated"}:
+        risk_message = (
+            "This result reports a potentially serious interaction. "
             "Seek advice from a qualified healthcare professional "
             "before taking these medicines together."
         )
     elif severity == "moderate":
         risk_message = (
-            "This result indicates a potentially significant interaction. "
+            "This result reports a potentially significant interaction. "
             "Ask a qualified healthcare professional how to manage it."
         )
     elif severity == "minor":
         risk_message = (
-            "This result indicates a minor interaction in the available data. "
+            "This result reports a minor interaction in the available data. "
             "Ask a healthcare professional if you have concerns."
         )
     elif severity in {"none", "low"}:
@@ -58,6 +77,7 @@ def explain_interaction(interaction_result):
     explanation = (
         f"Medicines: {drug_a} and {drug_b}\n"
         f"Reported severity: {severity.title()}\n"
+        f"Evidence status: {evidence_status.replace('_', ' ').title()}\n"
         f"Explanation: {risk_message}"
     )
 
