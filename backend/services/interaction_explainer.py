@@ -1,6 +1,6 @@
 
 def explain_interaction(interaction_result):
-    """Explain an interaction result without overstating the available evidence."""
+    """Explain an interaction result without overstating available evidence."""
 
     if not isinstance(interaction_result, dict):
         raise TypeError("interaction_result must be a dictionary.")
@@ -27,9 +27,12 @@ def explain_interaction(interaction_result):
 
     description = description.strip() if description else ""
 
-    evidence_status = str(
-        interaction_result.get("evidence_status", "unknown")
-    ).strip().lower()
+    if "evidence_status" in interaction_result:
+        evidence_status = str(
+            interaction_result["evidence_status"] or "unknown"
+        ).strip().lower()
+    else:
+        evidence_status = "reported" if severity else "unknown"
 
     if evidence_status not in {"reported", "not_found", "unknown"}:
         evidence_status = "unknown"
@@ -43,8 +46,9 @@ def explain_interaction(interaction_result):
     elif evidence_status == "unknown":
         severity = "unknown"
         risk_message = (
-            "There is insufficient evidence in this result to determine "
-            "the interaction risk. Consult a qualified healthcare professional."
+            "The interaction risk cannot be determined because there is "
+            "insufficient evidence in this result. Consult a qualified "
+            "healthcare professional."
         )
     elif severity in {"major", "contraindicated"}:
         risk_message = (
@@ -91,3 +95,113 @@ def explain_interaction(interaction_result):
     )
 
     return explanation
+
+def test_reported_evidence_status_is_displayed():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "evidence_status": "reported",
+    })
+    assert "Evidence status: Reported" in result
+    assert "potentially significant interaction" in result
+
+
+def test_not_found_evidence_does_not_claim_safety():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "none",
+        "evidence_status": "not_found",
+    })
+    assert "Evidence status: Not Found" in result
+    assert "does not establish" in result
+    assert "Reported severity: Unknown" in result
+
+
+def test_unknown_evidence_uses_cautious_explanation():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "evidence_status": "unknown",
+    })
+    assert "Evidence status: Unknown" in result
+    assert "insufficient evidence" in result
+    assert "Reported severity: Unknown" in result
+
+
+def test_invalid_evidence_status_defaults_to_unknown():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "major",
+        "evidence_status": "verified_safe",
+    })
+    assert "Evidence status: Unknown" in result
+    assert "cannot be determined" in result
+
+
+def test_safety_note_is_present_for_not_found_evidence():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "evidence_status": "not_found",
+    })
+    assert "Safety note:" in result
+
+
+
+def test_reported_evidence_status_is_displayed():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "evidence_status": "reported",
+    })
+    assert "Evidence status: Reported" in result
+    assert "potentially significant interaction" in result
+
+
+def test_not_found_evidence_does_not_claim_safety():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "none",
+        "evidence_status": "not_found",
+    })
+    assert "Evidence status: Not Found" in result
+    assert "does not establish" in result
+    assert "Reported severity: Unknown" in result
+
+
+def test_unknown_evidence_uses_cautious_explanation():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "evidence_status": "unknown",
+    })
+    assert "Evidence status: Unknown" in result
+    assert "insufficient evidence" in result
+    assert "Reported severity: Unknown" in result
+
+
+def test_invalid_evidence_status_defaults_to_unknown():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "major",
+        "evidence_status": "verified_safe",
+    })
+    assert "Evidence status: Unknown" in result
+    assert "cannot be determined" in result
+
+
+def test_safety_note_is_present_for_not_found_evidence():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "evidence_status": "not_found",
+    })
+    assert "Safety note:" in result
