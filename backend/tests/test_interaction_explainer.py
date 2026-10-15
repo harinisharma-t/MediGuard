@@ -182,3 +182,15 @@ def test_safety_note_is_present_for_not_found_evidence():
         "evidence_status": "not_found",
     })
     assert "Safety note:" in result
+
+def test_non_string_evidence_status_defaults_to_unknown():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "major",
+        "evidence_status": ["reported"],
+    })
+
+    assert "Evidence status: Unknown" in result
+    assert "cannot be determined" in result
+    assert "Reported severity: Unknown" in result
