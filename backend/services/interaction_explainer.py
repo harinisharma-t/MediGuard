@@ -1,4 +1,3 @@
-
 def explain_interaction(interaction_result):
     """Explain an interaction result without overstating available evidence."""
 
@@ -28,9 +27,14 @@ def explain_interaction(interaction_result):
     description = description.strip() if description else ""
 
     if "evidence_status" in interaction_result:
-        evidence_status = str(
-            interaction_result["evidence_status"] or "unknown"
-        ).strip().lower()
+        raw_evidence_status = interaction_result["evidence_status"]
+
+        if not isinstance(raw_evidence_status, str):
+            evidence_status = "unknown"
+        else:
+            evidence_status = (
+                raw_evidence_status.strip().lower() or "unknown"
+            )
     else:
         evidence_status = "reported" if severity else "unknown"
 
