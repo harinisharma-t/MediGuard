@@ -246,3 +246,13 @@ def test_empty_evidence_status_is_unknown():
     assert "Evidence status: Unknown" in result
     assert "Reported severity: Unknown" in result
     assert "insufficient evidence" in result
+
+def test_description_whitespace_is_normalized():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "description": "  May   increase   risk.  ",
+    })
+
+    assert "Available details: May increase risk." in result
