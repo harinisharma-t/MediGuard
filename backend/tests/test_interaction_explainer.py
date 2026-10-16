@@ -212,3 +212,37 @@ def test_non_string_severity_defaults_to_unknown():
 
     assert "Reported severity: Unknown" in result
     assert "cannot be determined" in result
+# DAY 26 TEST CHECK
+
+
+def test_missing_interaction_data_uses_unknown_status():
+    result = explain_interaction({})
+
+    assert "Medicines: Unknown drug and Unknown drug" in result
+    assert "Reported severity: Unknown" in result
+    assert "Evidence status: Unknown" in result
+    assert "insufficient evidence" in result
+
+
+def test_missing_evidence_status_with_severity_is_reported():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+    })
+
+    assert "Evidence status: Reported" in result
+    assert "Reported severity: Moderate" in result
+
+
+def test_empty_evidence_status_is_unknown():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "major",
+        "evidence_status": " ",
+    })
+
+    assert "Evidence status: Unknown" in result
+    assert "Reported severity: Unknown" in result
+    assert "insufficient evidence" in result
