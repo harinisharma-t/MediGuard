@@ -14,13 +14,16 @@ def explain_interaction(interaction_result):
     drug_b = drug_b or "Unknown drug"
 
     raw_severity = interaction_result.get("severity")
-    severity = (
-        str(raw_severity).strip().lower()
-        if raw_severity is not None
-        else ""
-    )
+
+    if raw_severity is None:
+        severity = ""
+    elif isinstance(raw_severity, str):
+        severity = raw_severity.strip().lower()
+    else:
+        severity = "unknown"
 
     description = interaction_result.get("description")
+
     if description is not None and not isinstance(description, str):
         raise TypeError("description must be a string or None.")
 
