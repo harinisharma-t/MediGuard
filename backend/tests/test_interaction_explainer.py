@@ -203,3 +203,12 @@ def test_multiline_description_is_formatted_safely():
     })
 
     assert "Available details: First line Second line" in result
+def test_non_string_severity_defaults_to_unknown():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": ["major"],
+    })
+
+    assert "Reported severity: Unknown" in result
+    assert "cannot be determined" in result
