@@ -194,3 +194,12 @@ def test_non_string_evidence_status_defaults_to_unknown():
     assert "Evidence status: Unknown" in result
     assert "cannot be determined" in result
     assert "Reported severity: Unknown" in result
+def test_multiline_description_is_formatted_safely():
+    result = explain_interaction({
+        "drug_a": "Drug A",
+        "drug_b": "Drug B",
+        "severity": "moderate",
+        "description": "First line\nSecond line",
+    })
+
+    assert "Available details: First line Second line" in result
