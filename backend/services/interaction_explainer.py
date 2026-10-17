@@ -24,7 +24,7 @@ def explain_interaction(interaction_result):
     if description is not None and not isinstance(description, str):
         raise TypeError("description must be a string or None.")
 
-    description = description.strip() if description else ""
+    description = " ".join(description.split()) if description else ""
 
     if "evidence_status" in interaction_result:
         raw_evidence_status = interaction_result["evidence_status"]
