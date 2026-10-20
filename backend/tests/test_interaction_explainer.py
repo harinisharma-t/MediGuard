@@ -256,3 +256,12 @@ def test_description_whitespace_is_normalized():
     })
 
     assert "Available details: May increase risk." in result
+
+def test_blank_drug_names_use_unknown_label():
+    result = explain_interaction({
+        "drug_a": "   ",
+        "drug_b": "",
+        "severity": "moderate",
+    })
+
+    assert "Medicines: Unknown drug and Unknown drug" in result
