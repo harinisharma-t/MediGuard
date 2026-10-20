@@ -265,3 +265,14 @@ def test_blank_drug_names_use_unknown_label():
     })
 
     assert "Medicines: Unknown drug and Unknown drug" in result
+
+def test_drug_names_are_trimmed():
+    result = explain_interaction({
+        "drug_a": "  Drug A  ",
+        "drug_b": "  Drug B  ",
+        "severity": "moderate",
+    })
+
+    assert "Medicines: Drug A and Drug B" in result
+    assert "Drug A  " not in result
+    assert "  Drug B" not in result
