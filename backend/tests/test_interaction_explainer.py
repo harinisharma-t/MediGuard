@@ -276,3 +276,12 @@ def test_drug_names_are_trimmed():
     assert "Medicines: Drug A and Drug B" in result
     assert "Drug A  " not in result
     assert "  Drug B" not in result
+
+def test_non_string_drug_names_are_handled():
+    result = explain_interaction({
+        "drug_a": 123,
+        "drug_b": None,
+        "severity": "moderate",
+    })
+
+    assert "Medicines: 123 and Unknown drug" in result
