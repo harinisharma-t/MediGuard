@@ -285,3 +285,12 @@ def test_non_string_drug_names_are_handled():
     })
 
     assert "Medicines: 123 and Unknown drug" in result
+
+def test_numeric_drug_names_are_converted_to_strings():
+    result = explain_interaction({
+        "drug_a": 123,
+        "drug_b": 456,
+        "severity": "moderate",
+    })
+
+    assert "Medicines: 123 and 456" in result
