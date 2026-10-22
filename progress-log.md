@@ -23,3 +23,6 @@
 - Built an OpenFDA data collection pipeline that retrieves drug-label records in batches.
 - Extracted medication names, active ingredients, interaction information, contraindications, warnings, and precautions.
 - Collected a small working dataset for the next stages of MediGuard data processing.
+## Day 29
+- Added a test for mixed numeric and string drug names in interaction explanations.
+- Verified the interaction explainer test suite: 30 tests passed.
