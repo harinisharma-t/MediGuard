@@ -294,3 +294,12 @@ def test_numeric_drug_names_are_converted_to_strings():
     })
 
     assert "Medicines: 123 and 456" in result
+
+
+def test_numeric_drug_name_with_string_drug_name():
+    result = explain_interaction({
+        "drug_a": 123,
+        "drug_b": "Drug B",
+        "severity": "moderate",
+    })
+    assert "Medicines: 123 and Drug B" in result
