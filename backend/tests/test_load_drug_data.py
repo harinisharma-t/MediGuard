@@ -5,10 +5,7 @@ import sqlite3
 from database import load_drug_data
 
 
-def test_load_drug_data_inserts_drug_records(tmp_path, monkeypatch):
-    database_file = tmp_path / "test_mediguard.db"
-    data_file = tmp_path / "drug_data.json"
-
+def create_test_database(database_file):
     connection = sqlite3.connect(database_file)
     connection.execute(
         """
@@ -22,6 +19,13 @@ def test_load_drug_data_inserts_drug_records(tmp_path, monkeypatch):
     )
     connection.commit()
     connection.close()
+
+
+def test_load_drug_data_inserts_drug_records(tmp_path, monkeypatch):
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
 
     records = [
         {
@@ -48,3 +52,69 @@ def test_load_drug_data_inserts_drug_records(tmp_path, monkeypatch):
     assert drugs == [
         ("test medicine", "TestBrand", "test ingredient")
     ]
+
+
+def test_load_drug_data_skips_existing_drug_records(tmp_path, monkeypatch):
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["TestBrand"],
+            "generic_name": ["test medicine"],
+            "active_ingredient": ["test ingredient"],
+        }
+    ]
+
+    data_file.write_text(json.dumps(records), encoding="utf-8")
+
+    monkeypatch.setattr(load_drug_data, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", data_file)
+
+    first_count = load_drug_data.load_drug_data()
+    second_count = load_drug_data.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug_count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert first_count == 1
+    assert second_count == 0
+    assert drug_count == 1
+
+
+def test_load_drug_data_skips_records_without_generic_name(
+    tmp_path, monkeypatch
+):
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["IncompleteBrand"],
+            "generic_name": [],
+            "active_ingredient": ["test ingredient"],
+        }
+    ]
+
+    data_file.write_text(json.dumps(records), encoding="utf-8")
+
+    monkeypatch.setattr(load_drug_data, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", data_file)
+
+    inserted_count = load_drug_data.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug_count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert inserted_count == 0
+    assert drug_count == 0
