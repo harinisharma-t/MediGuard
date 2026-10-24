@@ -31,3 +31,8 @@
 - Added a test verifying that database initialization creates the required MediGuard tables.
 - Tested database initialization using a temporary SQLite database.
 - Confirmed that all 48 backend tests pass.
+
+## Day 31
+- Added a test for loading drug records into a temporary SQLite database.
+- Verified that drug names and active ingredients are inserted correctly.
+- Confirmed that all 49 backend tests pass.
