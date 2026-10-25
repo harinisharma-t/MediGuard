@@ -36,3 +36,8 @@
 - Added a test for loading drug records into a temporary SQLite database.
 - Verified that drug names and active ingredients are inserted correctly.
 - Confirmed that all 49 backend tests pass.
+
+## Day 33
+- Added a test for drug records with missing optional fields.
+- Verified that missing brand names and active ingredients are stored as `None`.
+- Confirmed that all 52 backend tests pass.
