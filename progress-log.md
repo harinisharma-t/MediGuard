@@ -46,3 +46,8 @@
 - Added a test for inserting multiple drug records in one operation.
 - Verified that three valid drug records are inserted successfully.
 - Confirmed that all 53 backend tests pass.
+
+## Day 35
+- Added a test for mixed valid and invalid drug records.
+- Verified that valid records are inserted while records without generic names are skipped.
+- Confirmed that all 54 backend tests pass.
