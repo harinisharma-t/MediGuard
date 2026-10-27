@@ -41,3 +41,8 @@
 - Added a test for drug records with missing optional fields.
 - Verified that missing brand names and active ingredients are stored as `None`.
 - Confirmed that all 52 backend tests pass.
+
+## Day 34
+- Added a test for inserting multiple drug records in one operation.
+- Verified that three valid drug records are inserted successfully.
+- Confirmed that all 53 backend tests pass.
