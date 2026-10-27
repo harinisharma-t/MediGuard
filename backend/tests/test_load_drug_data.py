@@ -148,3 +148,44 @@ def test_load_drug_data_handles_missing_optional_fields(
 
     assert inserted_count == 1
     assert drug == ("test medicine", None, None)
+def test_load_drug_data_inserts_multiple_drug_records(
+    tmp_path, monkeypatch
+):
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["BrandA"],
+            "generic_name": ["medicine a"],
+            "active_ingredient": ["ingredient a"],
+        },
+        {
+            "brand_name": ["BrandB"],
+            "generic_name": ["medicine b"],
+            "active_ingredient": ["ingredient b"],
+        },
+        {
+            "brand_name": ["BrandC"],
+            "generic_name": ["medicine c"],
+            "active_ingredient": ["ingredient c"],
+        },
+    ]
+
+    data_file.write_text(json.dumps(records), encoding="utf-8")
+
+    monkeypatch.setattr(load_drug_data, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", data_file)
+
+    inserted_count = load_drug_data.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug_count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert inserted_count == 3
+    assert drug_count == 3
