@@ -51,3 +51,8 @@
 - Added a test for mixed valid and invalid drug records.
 - Verified that valid records are inserted while records without generic names are skipped.
 - Confirmed that all 54 backend tests pass.
+
+## Day 36
+- Added a test for duplicate drug records within the same dataset.
+- Verified that duplicate records are inserted only once.
+- Confirmed that all 55 backend tests pass.
