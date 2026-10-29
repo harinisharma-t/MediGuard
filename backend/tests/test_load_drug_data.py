@@ -231,3 +231,34 @@ def test_load_drug_data_skips_invalid_records_and_inserts_valid_ones(
 
     assert inserted_count == 2
     assert drugs == [("another medicine",), ("valid medicine",)]
+
+def test_load_drug_data_skips_duplicate_records_in_same_dataset(
+    tmp_path, monkeypatch
+):
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    duplicate_record = {
+        "brand_name": ["TestBrand"],
+        "generic_name": ["test medicine"],
+        "active_ingredient": ["test ingredient"],
+    }
+    records = [duplicate_record, duplicate_record.copy()]
+
+    data_file.write_text(json.dumps(records), encoding="utf-8")
+
+    monkeypatch.setattr(load_drug_data, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", data_file)
+
+    inserted_count = load_drug_data.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug_count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert inserted_count == 1
+    assert drug_count == 1
