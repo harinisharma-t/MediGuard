@@ -56,3 +56,8 @@
 - Added a test for duplicate drug records within the same dataset.
 - Verified that duplicate records are inserted only once.
 - Confirmed that all 55 backend tests pass.
+
+## Day 37
+- Added a test for different brands sharing the same generic drug name.
+- Verified that both brand records are inserted separately.
+- Confirmed that all 56 backend tests pass.
