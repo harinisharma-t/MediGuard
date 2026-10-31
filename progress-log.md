@@ -61,3 +61,8 @@
 - Added a test for different brands sharing the same generic drug name.
 - Verified that both brand records are inserted separately.
 - Confirmed that all 56 backend tests pass.
+
+## Day 38
+- Added a test for the same brand name associated with different generic medicines.
+- Verified that both drug records are inserted separately.
+- Confirmed that all 57 backend tests pass.
