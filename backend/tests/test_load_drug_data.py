@@ -350,3 +350,41 @@ def test_load_drug_data_inserts_same_brand_with_different_generic_names(
         ("medicine a", "SharedBrand"),
         ("medicine b", "SharedBrand"),
     ]
+def test_load_drug_data_uses_first_value_from_each_field(tmp_path, monkeypatch):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["PrimaryBrand", "SecondaryBrand"],
+            "generic_name": ["primary medicine", "secondary medicine"],
+            "active_ingredient": ["primary ingredient", "secondary ingredient"],
+        }
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    inserted_count = loader.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug = connection.execute(
+        "SELECT generic_name, brand_name, active_ingredient FROM drugs"
+    ).fetchone()
+    connection.close()
+
+    assert inserted_count == 1
+    assert drug == (
+        "primary medicine",
+        "PrimaryBrand",
+        "primary ingredient",
+    )
