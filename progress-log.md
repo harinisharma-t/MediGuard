@@ -66,3 +66,8 @@
 - Added a test for the same brand name associated with different generic medicines.
 - Verified that both drug records are inserted separately.
 - Confirmed that all 57 backend tests pass.
+
+## Day 39
+- Added a test to verify how the drug loader handles multiple values in OpenFDA fields.
+- Verified that the first brand name, generic name, and active ingredient are selected.
+- Confirmed that all 58 backend tests pass.
