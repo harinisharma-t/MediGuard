@@ -388,3 +388,41 @@ def test_load_drug_data_uses_first_value_from_each_field(tmp_path, monkeypatch):
         "PrimaryBrand",
         "primary ingredient",
     )
+def test_load_drug_data_can_run_multiple_times_without_duplicates(
+    tmp_path, monkeypatch
+):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["TestBrand"],
+            "generic_name": ["test medicine"],
+            "active_ingredient": ["test ingredient"],
+        }
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    first_inserted_count = loader.load_drug_data()
+    second_inserted_count = loader.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drug_count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert first_inserted_count == 1
+    assert second_inserted_count == 0
+    assert drug_count == 1
