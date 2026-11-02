@@ -71,3 +71,8 @@
 - Added a test to verify how the drug loader handles multiple values in OpenFDA fields.
 - Verified that the first brand name, generic name, and active ingredient are selected.
 - Confirmed that all 58 backend tests pass.
+
+## Day 40
+- Added a test to verify repeated execution of the drug data loader.
+- Confirmed that the first execution inserts the record and the second inserts no duplicates.
+- Verified that all 59 backend tests pass.
