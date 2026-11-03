@@ -76,3 +76,8 @@
 - Added a test to verify repeated execution of the drug data loader.
 - Confirmed that the first execution inserts the record and the second inserts no duplicates.
 - Verified that all 59 backend tests pass.
+
+## Day 41
+- Added a test for OpenFDA records containing empty name lists.
+- Verified that records without a generic name are skipped while valid records are inserted.
+- Confirmed that all 60 backend tests pass.
