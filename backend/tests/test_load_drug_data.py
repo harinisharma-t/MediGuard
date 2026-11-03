@@ -426,3 +426,46 @@ def test_load_drug_data_can_run_multiple_times_without_duplicates(
     assert first_inserted_count == 1
     assert second_inserted_count == 0
     assert drug_count == 1
+def test_load_drug_data_skips_records_with_empty_name_lists(
+    tmp_path, monkeypatch
+):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": [],
+            "generic_name": [],
+            "active_ingredient": [],
+        },
+        {
+            "brand_name": ["ValidBrand"],
+            "generic_name": ["valid medicine"],
+            "active_ingredient": ["valid ingredient"],
+        },
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    inserted_count = loader.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drugs = connection.execute(
+        "SELECT generic_name, brand_name, active_ingredient FROM drugs"
+    ).fetchall()
+    connection.close()
+
+    assert inserted_count == 1
+    assert drugs == [
+        ("valid medicine", "ValidBrand", "valid ingredient")
+    ]
