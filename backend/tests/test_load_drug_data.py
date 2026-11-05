@@ -495,3 +495,44 @@ def test_load_drug_data_handles_empty_dataset(tmp_path, monkeypatch):
 
     assert inserted_count == 0
     assert drug_count == 0
+def test_load_drug_data_skips_non_dictionary_records(
+    tmp_path, monkeypatch
+):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        None,
+        "invalid record",
+        123,
+        {
+            "brand_name": ["ValidBrand"],
+            "generic_name": ["valid medicine"],
+            "active_ingredient": ["valid ingredient"],
+        },
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    inserted_count = loader.load_drug_data()
+
+    connection = sqlite3.connect(database_file)
+    drugs = connection.execute(
+        "SELECT generic_name, brand_name, active_ingredient FROM drugs"
+    ).fetchall()
+    connection.close()
+
+    assert inserted_count == 1
+    assert drugs == [
+        ("valid medicine", "ValidBrand", "valid ingredient")
+    ]

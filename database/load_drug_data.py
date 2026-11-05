@@ -19,6 +19,9 @@ def load_drug_data():
     inserted_count = 0
 
     for record in records:
+        if not isinstance(record, dict):
+            continue
+
         brand_names = record.get("brand_name", [])
         generic_names = record.get("generic_name", [])
         active_ingredients = record.get("active_ingredient", [])
