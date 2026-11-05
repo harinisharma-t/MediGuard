@@ -86,3 +86,9 @@
 - Added a test for handling an empty OpenFDA dataset.
 - Verified that the loader returns zero and inserts no drug records.
 - Confirmed that all 61 backend tests pass.
+
+## Day 43
+- Improved drug data loading by skipping non-dictionary records.
+- Added tests for malformed records containing None, strings, and numbers.
+- Verified that valid records continue to load correctly.
+- Confirmed that all 62 backend tests pass.
