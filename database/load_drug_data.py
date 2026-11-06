@@ -1,3 +1,4 @@
+
 import json
 import sqlite3
 from pathlib import Path
@@ -26,11 +27,21 @@ def load_drug_data():
         generic_names = record.get("generic_name", [])
         active_ingredients = record.get("active_ingredient", [])
 
-        brand_name = brand_names[0] if brand_names else None
-        generic_name = generic_names[0] if generic_names else None
+        brand_name = (
+            brand_names[0]
+            if isinstance(brand_names, list) and brand_names
+            else None
+        )
+
+        generic_name = (
+            generic_names[0]
+            if isinstance(generic_names, list) and generic_names
+            else None
+        )
+
         active_ingredient = (
             active_ingredients[0]
-            if active_ingredients
+            if isinstance(active_ingredients, list) and active_ingredients
             else None
         )
 
