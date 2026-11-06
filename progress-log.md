@@ -92,3 +92,9 @@
 - Added tests for malformed records containing None, strings, and numbers.
 - Verified that valid records continue to load correctly.
 - Confirmed that all 62 backend tests pass.
+
+## Day 44
+- Improved drug data validation for malformed OpenFDA field values.
+- Added checks to ensure brand names, generic names, and active ingredients are lists.
+- Added a test covering non-list field values.
+- Confirmed that all 63 backend tests pass.
