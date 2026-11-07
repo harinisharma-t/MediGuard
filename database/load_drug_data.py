@@ -19,68 +19,71 @@ def load_drug_data():
 
     inserted_count = 0
 
-    for record in records:
-        if not isinstance(record, dict):
-            continue
+    try:
+        for record in records:
+            if not isinstance(record, dict):
+                continue
 
-        brand_names = record.get("brand_name", [])
-        generic_names = record.get("generic_name", [])
-        active_ingredients = record.get("active_ingredient", [])
+            brand_names = record.get("brand_name", [])
+            generic_names = record.get("generic_name", [])
+            active_ingredients = record.get("active_ingredient", [])
 
-        brand_name = (
-            brand_names[0]
-            if isinstance(brand_names, list) and brand_names
-            else None
-        )
-
-        generic_name = (
-            generic_names[0]
-            if isinstance(generic_names, list) and generic_names
-            else None
-        )
-
-        active_ingredient = (
-            active_ingredients[0]
-            if isinstance(active_ingredients, list) and active_ingredients
-            else None
-        )
-
-        if not generic_name:
-            continue
-
-        existing_drug = connection.execute(
-            """
-            SELECT id
-            FROM drugs
-            WHERE generic_name = ?
-              AND brand_name IS ?
-            """,
-            (generic_name, brand_name),
-        ).fetchone()
-
-        if existing_drug:
-            continue
-
-        connection.execute(
-            """
-            INSERT INTO drugs (
-                generic_name,
-                brand_name,
-                active_ingredient
+            brand_name = (
+                brand_names[0]
+                if isinstance(brand_names, list) and brand_names
+                else None
             )
-            VALUES (?, ?, ?)
-            """,
-            (
-                generic_name,
-                brand_name,
-                active_ingredient,
-            ),
-        )
 
-        inserted_count += 1
+            generic_name = (
+                generic_names[0]
+                if isinstance(generic_names, list) and generic_names
+                else None
+            )
 
-    connection.commit()
-    connection.close()
+            active_ingredient = (
+                active_ingredients[0]
+                if isinstance(active_ingredients, list) and active_ingredients
+                else None
+            )
+
+            if not generic_name:
+                continue
+
+            existing_drug = connection.execute(
+                """
+                SELECT id
+                FROM drugs
+                WHERE generic_name = ?
+                  AND brand_name IS ?
+                """,
+                (generic_name, brand_name),
+            ).fetchone()
+
+            if existing_drug:
+                continue
+
+            connection.execute(
+                """
+                INSERT INTO drugs (
+                    generic_name,
+                    brand_name,
+                    active_ingredient
+                )
+                VALUES (?, ?, ?)
+                """,
+                (
+                    generic_name,
+                    brand_name,
+                    active_ingredient,
+                ),
+            )
+
+            inserted_count += 1
+
+        connection.commit()
+
+    finally:
+        connection.close()
 
     return inserted_count
 

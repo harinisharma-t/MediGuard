@@ -577,3 +577,75 @@ def test_load_drug_data_handles_non_list_field_values(
 
     assert inserted_count == 1
     assert drugs == [("valid medicine", None, None)]
+def test_load_drug_data_closes_connection_after_database_error(
+    tmp_path, monkeypatch
+):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    original_connect = sqlite3.connect
+
+    setup_connection = original_connect(database_file)
+    setup_connection.execute(
+        """
+        CREATE TRIGGER force_insert_error
+        BEFORE INSERT ON drugs
+        BEGIN
+            SELECT RAISE(ABORT, 'Forced database error');
+        END;
+        """
+    )
+    setup_connection.commit()
+    setup_connection.close()
+
+    records = [
+        {
+            "brand_name": ["TestBrand"],
+            "generic_name": ["test medicine"],
+            "active_ingredient": ["test ingredient"],
+        }
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    class TrackingConnection:
+        def __init__(self, connection):
+            self.connection = connection
+            self.closed = False
+
+        def execute(self, *args):
+            return self.connection.execute(*args)
+
+        def commit(self):
+            return self.connection.commit()
+
+        def close(self):
+            self.closed = True
+            self.connection.close()
+
+    tracking_connection = TrackingConnection(
+        original_connect(database_file)
+    )
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+    monkeypatch.setattr(
+        loader.sqlite3,
+        "connect",
+        lambda database: tracking_connection,
+    )
+
+    try:
+        loader.load_drug_data()
+        assert False, "Expected a database insertion error"
+    except sqlite3.IntegrityError:
+        pass
+
+    assert tracking_connection.closed is True
