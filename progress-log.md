@@ -98,3 +98,7 @@
 - Added checks to ensure brand names, generic names, and active ingredients are lists.
 - Added a test covering non-list field values.
 - Confirmed that all 63 backend tests pass.
+## Day 45
+- Improved database connection cleanup using a try/finally block.
+- Added a test verifying that the SQLite connection closes after an insertion error.
+- Confirmed that all 64 backend tests pass.
