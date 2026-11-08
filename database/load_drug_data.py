@@ -1,4 +1,4 @@
-
+﻿
 import json
 import sqlite3
 from pathlib import Path
@@ -14,6 +14,9 @@ DATA_FILE = PROJECT_ROOT / "data" / "openfda_drug_labels.json"
 def load_drug_data():
     with open(DATA_FILE, "r", encoding="utf-8") as file:
         records = json.load(file)
+
+    if not isinstance(records, list):
+        return 0
 
     connection = sqlite3.connect(DATABASE_FILE)
 

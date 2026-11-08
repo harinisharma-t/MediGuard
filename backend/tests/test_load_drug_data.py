@@ -649,3 +649,21 @@ def test_load_drug_data_closes_connection_after_database_error(
         pass
 
     assert tracking_connection.closed is True
+def test_load_drug_data_handles_non_list_dataset(tmp_path, monkeypatch):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    data_file = tmp_path / "drug_data.json"
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump({"generic_name": ["test medicine"]}, file)
+
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    def unexpected_connect(*args, **kwargs):
+        raise AssertionError("Database should not be opened")
+
+    monkeypatch.setattr(loader.sqlite3, "connect", unexpected_connect)
+
+    assert loader.load_drug_data() == 0
