@@ -667,3 +667,38 @@ def test_load_drug_data_handles_non_list_dataset(tmp_path, monkeypatch):
     monkeypatch.setattr(loader.sqlite3, "connect", unexpected_connect)
 
     assert loader.load_drug_data() == 0
+def test_load_drug_data_skips_whitespace_only_generic_names(
+    tmp_path, monkeypatch
+):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    database_file = tmp_path / "test_mediguard.db"
+    data_file = tmp_path / "drug_data.json"
+
+    create_test_database(database_file)
+
+    records = [
+        {
+            "brand_name": ["TestBrand"],
+            "generic_name": ["   "],
+            "active_ingredient": ["test ingredient"],
+        }
+    ]
+
+    with open(data_file, "w", encoding="utf-8") as file:
+        json.dump(records, file)
+
+    monkeypatch.setattr(loader, "DATABASE_FILE", database_file)
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    assert loader.load_drug_data() == 0
+
+    connection = sqlite3.connect(database_file)
+    count = connection.execute(
+        "SELECT COUNT(*) FROM drugs"
+    ).fetchone()[0]
+    connection.close()
+
+    assert count == 0

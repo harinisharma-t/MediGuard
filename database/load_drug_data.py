@@ -49,7 +49,7 @@ def load_drug_data():
                 else None
             )
 
-            if not generic_name:
+            if not isinstance(generic_name, str) or not generic_name.strip():
                 continue
 
             existing_drug = connection.execute(
@@ -96,3 +96,4 @@ if __name__ == "__main__":
 
     print("Drug data loading completed.")
     print("New drug records inserted:", inserted_count)
+
