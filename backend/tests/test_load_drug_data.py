@@ -1,6 +1,6 @@
-
 import json
 import sqlite3
+import database.load_drug_data as load_drug_data
 
 from database import load_drug_data
 
@@ -702,3 +702,16 @@ def test_load_drug_data_skips_whitespace_only_generic_names(
     connection.close()
 
     assert count == 0
+def test_load_drug_data_handles_missing_file(monkeypatch, tmp_path):
+    missing_file = tmp_path / "missing.json"
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", missing_file)
+
+    assert load_drug_data.load_drug_data() == 0
+
+
+def test_load_drug_data_handles_invalid_json(monkeypatch, tmp_path):
+    invalid_file = tmp_path / "invalid.json"
+    invalid_file.write_text("{invalid json", encoding="utf-8")
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", invalid_file)
+
+    assert load_drug_data.load_drug_data() == 0

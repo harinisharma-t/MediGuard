@@ -12,8 +12,11 @@ DATA_FILE = PROJECT_ROOT / "data" / "openfda_drug_labels.json"
 
 
 def load_drug_data():
-    with open(DATA_FILE, "r", encoding="utf-8") as file:
-        records = json.load(file)
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as file:
+            records = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return 0
 
     if not isinstance(records, list):
         return 0
@@ -74,11 +77,7 @@ def load_drug_data():
                 )
                 VALUES (?, ?, ?)
                 """,
-                (
-                    generic_name,
-                    brand_name,
-                    active_ingredient,
-                ),
+                (generic_name, brand_name, active_ingredient),
             )
 
             inserted_count += 1
@@ -96,4 +95,3 @@ if __name__ == "__main__":
 
     print("Drug data loading completed.")
     print("New drug records inserted:", inserted_count)
-
