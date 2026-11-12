@@ -715,3 +715,10 @@ def test_load_drug_data_handles_invalid_json(monkeypatch, tmp_path):
     monkeypatch.setattr(load_drug_data, "DATA_FILE", invalid_file)
 
     assert load_drug_data.load_drug_data() == 0
+def test_load_drug_data_handles_empty_file(monkeypatch, tmp_path):
+    empty_file = tmp_path / "empty.json"
+    empty_file.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(load_drug_data, "DATA_FILE", empty_file)
+
+    assert load_drug_data.load_drug_data() == 0
