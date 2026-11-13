@@ -2,8 +2,6 @@ import json
 import sqlite3
 import database.load_drug_data as load_drug_data
 
-from database import load_drug_data
-
 
 def create_test_database(database_file):
     connection = sqlite3.connect(database_file)
@@ -722,3 +720,14 @@ def test_load_drug_data_handles_empty_file(monkeypatch, tmp_path):
     monkeypatch.setattr(load_drug_data, "DATA_FILE", empty_file)
 
     assert load_drug_data.load_drug_data() == 0
+def test_load_drug_data_handles_null_dataset(monkeypatch, tmp_path):
+    import importlib
+
+    loader = importlib.import_module("database.load_drug_data")
+
+    data_file = tmp_path / "drug_data.json"
+    data_file.write_text("null", encoding="utf-8")
+
+    monkeypatch.setattr(loader, "DATA_FILE", data_file)
+
+    assert loader.load_drug_data() == 0
