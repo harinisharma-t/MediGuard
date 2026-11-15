@@ -1,4 +1,14 @@
+import sqlite3
+from pathlib import Path
+
 from fastapi import FastAPI
+
+
+DATABASE_FILE = (
+    Path(__file__).resolve().parents[2]
+    / "database"
+    / "mediguard.db"
+)
 
 
 app = FastAPI(
@@ -24,4 +34,29 @@ def health_check():
     return {
         "status": "healthy",
         "application": "MediGuard",
+    }
+
+
+@app.get("/drugs/search")
+def search_drugs(query: str):
+    search_term = f"%{query.strip()}%"
+
+    with sqlite3.connect(DATABASE_FILE) as connection:
+        connection.row_factory = sqlite3.Row
+
+        drugs = connection.execute(
+            """
+            SELECT id, generic_name, brand_name, active_ingredient
+            FROM drugs
+            WHERE LOWER(generic_name) LIKE LOWER(?)
+               OR LOWER(brand_name) LIKE LOWER(?)
+            ORDER BY generic_name;
+            """,
+            (search_term, search_term),
+        ).fetchall()
+
+    return {
+        "query": query,
+        "count": len(drugs),
+        "results": [dict(drug) for drug in drugs],
     }
