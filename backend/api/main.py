@@ -1,7 +1,7 @@
 import sqlite3
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
 
 
 DATABASE_FILE = (
@@ -38,8 +38,18 @@ def health_check():
 
 
 @app.get("/drugs/search")
-def search_drugs(query: str):
-    search_term = f"%{query.strip()}%"
+def search_drugs(
+    query: str = Query(..., min_length=1, max_length=100)
+):
+    query = query.strip()
+
+    if not query:
+        raise HTTPException(
+            status_code=422,
+            detail="Search query cannot be empty.",
+        )
+
+    search_term = f"%{query}%"
 
     with sqlite3.connect(DATABASE_FILE) as connection:
         connection.row_factory = sqlite3.Row
