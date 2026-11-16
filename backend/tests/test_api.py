@@ -96,3 +96,71 @@ def test_drug_search_rejects_long_query():
     )
 
     assert response.status_code == 422
+def test_interaction_check_returns_valid_response():
+    response = client.get(
+        "/interactions/check",
+        params={
+            "drug_a": "Naproxen",
+            "drug_b": "Betadine",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["drug_a"] == "Naproxen"
+    assert data["drug_b"] == "Betadine"
+    assert "found" in data["result"]
+    assert "disclaimer" in data
+
+
+def test_interaction_check_handles_unknown_drug():
+    response = client.get(
+        "/interactions/check",
+        params={
+            "drug_a": "UnknownMedicine",
+            "drug_b": "Betadine",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result"]["found"] is False
+
+
+def test_interaction_check_rejects_missing_drug():
+    response = client.get(
+        "/interactions/check",
+        params={"drug_a": "Naproxen"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_interaction_check_rejects_empty_drug():
+    response = client.get(
+        "/interactions/check",
+        params={"drug_a": "", "drug_b": "Betadine"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_interaction_check_rejects_whitespace_drug():
+    response = client.get(
+        "/interactions/check",
+        params={"drug_a": "   ", "drug_b": "Betadine"},
+    )
+
+    assert response.status_code == 422
+
+
+def test_interaction_check_rejects_long_drug_name():
+    response = client.get(
+        "/interactions/check",
+        params={
+            "drug_a": "A" * 101,
+            "drug_b": "Betadine",
+        },
+    )
+
+    assert response.status_code == 422
