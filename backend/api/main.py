@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+from backend.core.interaction_checker import check_interaction
 
 from fastapi import FastAPI, HTTPException, Query
 
@@ -69,4 +70,30 @@ def search_drugs(
         "query": query,
         "count": len(drugs),
         "results": [dict(drug) for drug in drugs],
+    }
+@app.get("/interactions/check")
+def check_drug_interaction(
+    drug_a: str = Query(..., min_length=1, max_length=100),
+    drug_b: str = Query(..., min_length=1, max_length=100),
+):
+    drug_a = drug_a.strip()
+    drug_b = drug_b.strip()
+
+    if not drug_a or not drug_b:
+        raise HTTPException(
+            status_code=422,
+            detail="Both medicine names are required.",
+        )
+
+    result = check_interaction(drug_a, drug_b)
+
+    return {
+        "drug_a": drug_a,
+        "drug_b": drug_b,
+        "result": result,
+        "disclaimer": (
+            "This result is based on the available local database. "
+            "No recorded interaction does not prove that a "
+            "medicine combination is safe."
+        ),
     }
