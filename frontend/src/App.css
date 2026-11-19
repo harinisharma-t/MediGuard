@@ -1,0 +1,143 @@
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7fafc;
+  color: #183153;
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  height: 75px;
+  padding: 0 9%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  color: #167d83;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.navbar nav {
+  display: flex;
+  gap: 30px;
+}
+
+.navbar a {
+  color: #183153;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.navbar a:hover {
+  color: #167d83;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 110px 20px 100px;
+  background: linear-gradient(135deg, #e8f7f6, #f4f8ff);
+}
+
+.tagline {
+  color: #167d83;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.hero-section h1 {
+  font-size: 52px;
+  line-height: 1.2;
+  margin: 22px 0;
+}
+
+.hero-section h1 span {
+  color: #16878a;
+}
+
+.hero-description {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #617184;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.primary-button {
+  margin-top: 30px;
+  padding: 14px 32px;
+  background: #167d83;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #105f65;
+}
+
+.disclaimer {
+  margin-top: 25px;
+  color: #7b8998;
+  font-size: 13px;
+}
+
+.about-section {
+  text-align: center;
+  padding: 65px 20px;
+}
+
+.about-section h2 {
+  font-size: 30px;
+  color: #167d83;
+}
+
+.about-section p {
+  max-width: 650px;
+  margin: 15px auto;
+  color: #617184;
+  line-height: 1.8;
+}
+
+footer {
+  margin-top: auto;
+  padding: 22px;
+  text-align: center;
+  background: #183153;
+  color: white;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 5%;
+  }
+
+  .hero-section {
+    padding: 75px 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 36px;
+  }
+
+  .hero-description {
+    font-size: 15px;
+  }
+}
