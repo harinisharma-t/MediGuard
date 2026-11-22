@@ -10,6 +10,12 @@ function App() {
   const [error, setError] = useState('')
   const [searched, setSearched] = useState(false)
 
+  const [drugA, setDrugA] = useState('')
+  const [drugB, setDrugB] = useState('')
+  const [explanation, setExplanation] = useState(null)
+  const [interactionLoading, setInteractionLoading] = useState(false)
+  const [interactionError, setInteractionError] = useState('')
+
   async function handleSearch(event) {
     event.preventDefault()
 
@@ -31,9 +37,7 @@ function App() {
       )
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error('Search failed')
-      }
+      if (!response.ok) throw new Error()
 
       setResults(data.results || [])
     } catch {
@@ -43,17 +47,52 @@ function App() {
     }
   }
 
+  async function handleExplain(event) {
+    event.preventDefault()
+
+    if (!drugA.trim() || !drugB.trim()) {
+      setInteractionError('Please enter both medicine names.')
+      setExplanation(null)
+      return
+    }
+
+    setInteractionLoading(true)
+    setInteractionError('')
+    setExplanation(null)
+
+    try {
+      const response = await fetch('/api/interactions/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          drug_a: drugA.trim(),
+          drug_b: drugB.trim(),
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) throw new Error()
+
+      setExplanation(data)
+    } catch {
+      setInteractionError('Unable to check the interaction. Please try again.')
+    } finally {
+      setInteractionLoading(false)
+    }
+  }
+
   return (
     <div className="app">
       <header className="navbar">
         <h2 className="logo">MediGuard</h2>
         <nav>
-          <a href="#home" onClick={(event) => {
-            event.preventDefault()
+          <a href="#" onClick={(e) => {
+            e.preventDefault()
             setShowSearch(false)
           }}>Home</a>
-          <a href="#search" onClick={(event) => {
-            event.preventDefault()
+          <a href="#" onClick={(e) => {
+            e.preventDefault()
             setShowSearch(true)
           }}>Medicine Search</a>
           <a href="#about">About</a>
@@ -64,13 +103,20 @@ function App() {
         {!showSearch ? (
           <section className="hero-section" id="home">
             <p className="tagline">SMARTER MEDICATION AWARENESS</p>
-            <h1>Your Medication Safety,<br /><span>Our Priority.</span></h1>
+            <h1>
+              Your Medication Safety,
+              <br />
+              <span>Our Priority.</span>
+            </h1>
             <p className="hero-description">
               Understand potential drug interactions and allergy risks
               with AI-assisted medication safety information.
             </p>
-            <button className="primary-button" type="button"
-              onClick={() => setShowSearch(true)}>
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => setShowSearch(true)}
+            >
               Get Started
             </button>
             <p className="disclaimer">
@@ -98,62 +144,85 @@ function App() {
 
             {error && <p className="error-message">{error}</p>}
 
-            {loading && (
-              <p className="loading-message">Searching the medicine database...</p>
-            )}
-
             {searched && !loading && !error && results.length === 0 && (
-              <div className="empty-message">
-                <h3>No medicines found</h3>
-                <p>Try another medicine name or check the spelling.</p>
-              </div>
+              <p className="empty-message">
+                No matching medicines found in the database.
+              </p>
             )}
 
             {results.length > 0 && (
               <div className="results-section">
-                <div className="results-heading">
-                  <h3>Medicine Search Results</h3>
-                  <span>{results.length} found</span>
-                </div>
-
+                <h3>Search Results ({results.length})</h3>
                 <div className="medicine-list">
                   {results.map((medicine) => (
-                    <article className="medicine-card" key={medicine.id}>
-                      <div className="medicine-card-header">
-                        <div>
-                          <p className="medicine-label">MEDICINE</p>
-                          <h3>{medicine.generic_name}</h3>
-                        </div>
-                        <span className="medicine-id">ID: {medicine.id}</span>
-                      </div>
-
-                      <div className="medicine-details">
-                        <div>
-                          <span>Brand Name</span>
-                          <strong>{medicine.brand_name || 'Not available'}</strong>
-                        </div>
-                        <div>
-                          <span>Active Ingredient</span>
-                          <strong>{medicine.active_ingredient || 'Not available'}</strong>
-                        </div>
-                      </div>
-                    </article>
+                    <div className="medicine-card" key={medicine.id}>
+                      <h3>{medicine.generic_name}</h3>
+                      <p><strong>Brand Name:</strong> {medicine.brand_name || 'Not available'}</p>
+                      <p><strong>Active Ingredient:</strong> {medicine.active_ingredient || 'Not available'}</p>
+                    </div>
                   ))}
                 </div>
-
-                <p className="results-note">
-                  These results are based on the medicines available in the
-                  MediGuard database. Missing information does not mean a
-                  medicine is safe or risk-free.
-                </p>
               </div>
             )}
 
-            <button className="primary-button back-button" type="button"
-              onClick={() => {
-                setShowSearch(false)
-                setError('')
-              }}>
+            <div className="results-section">
+              <h2>AI Interaction Explanation</h2>
+              <p>
+                Enter two medicine names to check available interaction
+                information and receive an easy-to-understand explanation.
+              </p>
+
+              <form className="search-form" onSubmit={handleExplain}>
+                <input
+                  type="text"
+                  value={drugA}
+                  onChange={(e) => setDrugA(e.target.value)}
+                  placeholder="First medicine name"
+                  aria-label="First medicine name"
+                />
+                <input
+                  type="text"
+                  value={drugB}
+                  onChange={(e) => setDrugB(e.target.value)}
+                  placeholder="Second medicine name"
+                  aria-label="Second medicine name"
+                />
+                <button type="submit" disabled={interactionLoading}>
+                  {interactionLoading ? 'Checking...' : 'Check Interaction'}
+                </button>
+              </form>
+
+              {interactionError && (
+                <p className="error-message">{interactionError}</p>
+              )}
+
+              {explanation && (
+                <div className="medicine-card">
+                  <h3>Interaction Result</h3>
+                  <p><strong>Medicine 1:</strong> {explanation.drug_a}</p>
+                  <p><strong>Medicine 2:</strong> {explanation.drug_b}</p>
+                  <p>
+                    <strong>Database Result:</strong>{' '}
+                    {explanation.interaction?.message || 'No details available'}
+                  </p>
+                  <p><strong>Explanation:</strong></p>
+                  <p>{explanation.explanation}</p>
+                  <p>
+                    <strong>Provider:</strong> {explanation.provider}
+                  </p>
+                  {explanation.used_fallback && (
+                    <p>Rule-based explanation used because the AI service was unavailable.</p>
+                  )}
+                  <p className="disclaimer">{explanation.disclaimer}</p>
+                </div>
+              )}
+            </div>
+
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => setShowSearch(false)}
+            >
               Back to Home
             </button>
           </section>
