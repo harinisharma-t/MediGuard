@@ -37,7 +37,9 @@ function App() {
       )
       const data = await response.json()
 
-      if (!response.ok) throw new Error()
+      if (!response.ok) {
+        throw new Error('Search failed')
+      }
 
       setResults(data.results || [])
     } catch {
@@ -63,7 +65,9 @@ function App() {
     try {
       const response = await fetch('/api/interactions/explain', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           drug_a: drugA.trim(),
           drug_b: drugB.trim(),
@@ -72,14 +76,24 @@ function App() {
 
       const data = await response.json()
 
-      if (!response.ok) throw new Error()
+      if (!response.ok) {
+        throw new Error('Unable to generate explanation.')
+      }
 
       setExplanation(data)
     } catch {
-      setInteractionError('Unable to check the interaction. Please try again.')
+      setInteractionError(
+        'Unable to check the interaction. Please try again.'
+      )
     } finally {
       setInteractionLoading(false)
     }
+  }
+
+  function selectFirstMedicine(medicine) {
+    setDrugA(medicine.generic_name)
+    setInteractionError('')
+    setExplanation(null)
   }
 
   return (
@@ -127,7 +141,9 @@ function App() {
         ) : (
           <section className="search-section" id="search">
             <h2>Medicine Search</h2>
-            <p>Search our database to find available medicine information.</p>
+            <p>
+              Search our database to find available medicine information.
+            </p>
 
             <form className="search-form" onSubmit={handleSearch}>
               <input
@@ -136,17 +152,24 @@ function App() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Enter medicine name..."
                 aria-label="Medicine name"
+                disabled={loading}
               />
               <button type="submit" disabled={loading}>
                 {loading ? 'Searching...' : 'Search'}
               </button>
             </form>
 
-            {error && <p className="error-message">{error}</p>}
+            {loading && (
+              <p className="loading-message" role="status">
+                Searching the medicine database. Please wait...
+              </p>
+            )}
+
+            {error && <p className="error-message" role="alert">{error}</p>}
 
             {searched && !loading && !error && results.length === 0 && (
               <p className="empty-message">
-                No matching medicines found in the database.
+                No matching medicines found in the database. Try another name.
               </p>
             )}
 
@@ -157,8 +180,21 @@ function App() {
                   {results.map((medicine) => (
                     <div className="medicine-card" key={medicine.id}>
                       <h3>{medicine.generic_name}</h3>
-                      <p><strong>Brand Name:</strong> {medicine.brand_name || 'Not available'}</p>
-                      <p><strong>Active Ingredient:</strong> {medicine.active_ingredient || 'Not available'}</p>
+                      <p>
+                        <strong>Brand Name:</strong>{' '}
+                        {medicine.brand_name || 'Not available'}
+                      </p>
+                      <p>
+                        <strong>Active Ingredient:</strong>{' '}
+                        {medicine.active_ingredient || 'Not available'}
+                      </p>
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={() => selectFirstMedicine(medicine)}
+                      >
+                        Use as First Medicine
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -176,24 +212,34 @@ function App() {
                 <input
                   type="text"
                   value={drugA}
-                  onChange={(e) => setDrugA(e.target.value)}
+                  onChange={(event) => setDrugA(event.target.value)}
                   placeholder="First medicine name"
                   aria-label="First medicine name"
+                  disabled={interactionLoading}
                 />
                 <input
                   type="text"
                   value={drugB}
-                  onChange={(e) => setDrugB(e.target.value)}
+                  onChange={(event) => setDrugB(event.target.value)}
                   placeholder="Second medicine name"
                   aria-label="Second medicine name"
+                  disabled={interactionLoading}
                 />
                 <button type="submit" disabled={interactionLoading}>
                   {interactionLoading ? 'Checking...' : 'Check Interaction'}
                 </button>
               </form>
 
+              {interactionLoading && (
+                <p className="loading-message" role="status">
+                  Checking available interaction information. Please wait...
+                </p>
+              )}
+
               {interactionError && (
-                <p className="error-message">{interactionError}</p>
+                <p className="error-message" role="alert">
+                  {interactionError}
+                </p>
               )}
 
               {explanation && (
@@ -208,10 +254,12 @@ function App() {
                   <p><strong>Explanation:</strong></p>
                   <p>{explanation.explanation}</p>
                   <p>
-                    <strong>Provider:</strong> {explanation.provider}
+                    <strong>Explanation Provider:</strong> {explanation.provider}
                   </p>
                   {explanation.used_fallback && (
-                    <p>Rule-based explanation used because the AI service was unavailable.</p>
+                    <p>
+                      Rule-based explanation used because AI service was unavailable.
+                    </p>
                   )}
                   <p className="disclaimer">{explanation.disclaimer}</p>
                 </div>
