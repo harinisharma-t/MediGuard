@@ -74,6 +74,11 @@ function App() {
       return
     }
 
+
+    if (drugA.trim().toLowerCase() === drugB.trim().toLowerCase()) {
+  setInteractionError('Please select two different medicines.')
+  return
+}
     setInteractionLoading(true)
     setInteractionError('')
     setExplanation(null)
