@@ -65,6 +65,12 @@ function App() {
     setInteractionError('')
     setExplanation(null)
   }
+  function clearMedicines() {
+  setDrugA('')
+  setDrugB('')
+  setInteractionError('')
+  setExplanation(null)
+}
 
   async function handleExplain(event) {
     event.preventDefault()
@@ -282,6 +288,13 @@ function App() {
                 {interactionLoading ? 'Checking...' : 'Check Interaction'}
               </button>
             </form>
+            <button
+  className="primary-button"
+  type="button"
+  onClick={clearMedicines}
+>
+  Clear Medicines
+</button>
 
             {interactionLoading && (
               <p className="loading-message" role="status">
