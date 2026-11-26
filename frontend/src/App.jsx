@@ -38,7 +38,14 @@ function App() {
         throw new Error('Unable to search medicines. Please try again.')
       }
 
-      const data = await response.json()
+      const text = await response.text()
+let data
+
+try {
+  data = text ? JSON.parse(text) : {}
+} catch {
+  throw new Error('Server returned an invalid response. Please try again.')
+}
 
       const results = Array.isArray(data)
         ? data
