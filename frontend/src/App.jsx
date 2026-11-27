@@ -85,6 +85,13 @@ function App() {
     setExplanation(null)
   }
 
+  function clearSearch() {
+  setQuery('')
+  setMedicines([])
+  setSearchError('')
+  setSearched(false)
+}
+
   async function handleExplain(event) {
     event.preventDefault()
 
@@ -200,6 +207,14 @@ function App() {
               {loading ? 'Searching...' : 'Search Medicine'}
             </button>
           </form>
+          <button
+  className="primary-button"
+  type="button"
+  onClick={clearSearch}
+  disabled={loading}
+>
+  Clear Search
+</button>
 
           {loading && (
             <p className="loading-message" role="status">
