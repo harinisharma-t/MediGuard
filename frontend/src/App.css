@@ -372,3 +372,27 @@ footer {
   font-size: 14px;
   line-height: 1.5;
 }
+.selected-medicines {
+  margin: 20px 0;
+  padding: 18px;
+  background-color: #f4f7fb;
+  border: 1px solid #dce4ef;
+  border-radius: 10px;
+}
+
+.selected-medicines h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.selected-medicine-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #dce4ef;
+}
+
+.selected-medicine-item:last-child {
+  border-bottom: none;
+}

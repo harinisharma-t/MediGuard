@@ -291,6 +291,20 @@ function App() {
               the search results above.
             </p>
 
+            <div className="selected-medicines">
+  <h3>Selected Medicines</h3>
+
+  <div className="selected-medicine-item">
+    <strong>Medicine 1:</strong>
+    <span>{drugA || 'Not selected yet'}</span>
+  </div>
+
+  <div className="selected-medicine-item">
+    <strong>Medicine 2:</strong>
+    <span>{drugB || 'Not selected yet'}</span>
+  </div>
+</div>
+
             <form className="search-form" onSubmit={handleExplain}>
               <input
                 type="text"
