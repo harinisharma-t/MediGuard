@@ -362,3 +362,13 @@ footer {
     align-items: flex-start;
   }
 }
+.fallback-notice {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background-color: #fff4e5;
+  border-left: 4px solid #e69a32;
+  border-radius: 6px;
+  color: #805015;
+  font-size: 14px;
+  line-height: 1.5;
+}

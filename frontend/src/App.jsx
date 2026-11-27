@@ -358,6 +358,12 @@ function App() {
                     <strong>Fallback Used:</strong>{' '}
                     {String(explanation.used_fallback)}
                   </p>
+                  {explanation.used_fallback && (
+  <p className="fallback-notice" role="status">
+    AI service is currently unavailable. This explanation
+    was generated using MediGuard's rule-based fallback system.
+  </p>
+)}
                 </div>
 
                 <p className="disclaimer">{explanation.disclaimer}</p>
