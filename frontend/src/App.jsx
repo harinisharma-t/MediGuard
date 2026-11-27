@@ -16,6 +16,16 @@ function App() {
   const [interactionLoading, setInteractionLoading] = useState(false)
   const [interactionError, setInteractionError] = useState('')
 
+  async function readJsonResponse(response) {
+    const text = await response.text()
+
+    try {
+      return text ? JSON.parse(text) : {}
+    } catch {
+      throw new Error('Server returned an invalid response. Please try again.')
+    }
+  }
+
   async function handleSearch(event) {
     event.preventDefault()
 
@@ -34,18 +44,13 @@ function App() {
         `/api/drugs/search?query=${encodeURIComponent(query.trim())}`
       )
 
+      const data = await readJsonResponse(response)
+
       if (!response.ok) {
-        throw new Error('Unable to search medicines. Please try again.')
+        throw new Error(
+          data.detail || 'Unable to search medicines. Please try again.'
+        )
       }
-
-      const text = await response.text()
-let data
-
-try {
-  data = text ? JSON.parse(text) : {}
-} catch {
-  throw new Error('Server returned an invalid response. Please try again.')
-}
 
       const results = Array.isArray(data)
         ? data
@@ -72,12 +77,13 @@ try {
     setInteractionError('')
     setExplanation(null)
   }
+
   function clearMedicines() {
-  setDrugA('')
-  setDrugB('')
-  setInteractionError('')
-  setExplanation(null)
-}
+    setDrugA('')
+    setDrugB('')
+    setInteractionError('')
+    setExplanation(null)
+  }
 
   async function handleExplain(event) {
     event.preventDefault()
@@ -87,11 +93,11 @@ try {
       return
     }
 
-
     if (drugA.trim().toLowerCase() === drugB.trim().toLowerCase()) {
-  setInteractionError('Please select two different medicines.')
-  return
-}
+      setInteractionError('Please select two different medicines.')
+      return
+    }
+
     setInteractionLoading(true)
     setInteractionError('')
     setExplanation(null)
@@ -108,7 +114,7 @@ try {
         }),
       })
 
-      const data = await response.json()
+      const data = await readJsonResponse(response)
 
       if (!response.ok) {
         throw new Error(data.detail || 'Unable to check interaction.')
@@ -295,13 +301,14 @@ try {
                 {interactionLoading ? 'Checking...' : 'Check Interaction'}
               </button>
             </form>
+
             <button
-  className="primary-button"
-  type="button"
-  onClick={clearMedicines}
->
-  Clear Medicines
-</button>
+              className="primary-button"
+              type="button"
+              onClick={clearMedicines}
+            >
+              Clear Medicines
+            </button>
 
             {interactionLoading && (
               <p className="loading-message" role="status">
@@ -319,36 +326,41 @@ try {
               <div className="medicine-card">
                 <h3>Interaction Result</h3>
 
-                <p>
-                  <strong>Medicine 1:</strong> {explanation.drug_a}
-                </p>
+                <div className="result-section">
+                  <p>
+                    <strong>Medicine 1:</strong> {explanation.drug_a}
+                  </p>
 
-                <p>
-                  <strong>Medicine 2:</strong> {explanation.drug_b}
-                </p>
+                  <p>
+                    <strong>Medicine 2:</strong> {explanation.drug_b}
+                  </p>
 
-                <p>
-                  <strong>Interaction:</strong>{' '}
-                  {explanation.interaction?.message ||
-                    'No interaction information available.'}
-                </p>
+                  <p>
+                    <strong>Interaction:</strong>{' '}
+                    {explanation.interaction?.message ||
+                      'No interaction information available.'}
+                  </p>
+                </div>
 
-                <h3>AI Explanation</h3>
+                <div className="result-section">
+                  <h3>AI Explanation</h3>
+                  <p>{explanation.explanation}</p>
+                </div>
 
-                <p>{explanation.explanation}</p>
+                <div className="result-section">
+                  <h3>Technical Details</h3>
 
-                <p>
-                  <strong>Provider:</strong> {explanation.provider}
-                </p>
+                  <p>
+                    <strong>Provider:</strong> {explanation.provider}
+                  </p>
 
-                <p>
-                  <strong>Fallback Used:</strong>{' '}
-                  {String(explanation.used_fallback)}
-                </p>
+                  <p>
+                    <strong>Fallback Used:</strong>{' '}
+                    {String(explanation.used_fallback)}
+                  </p>
+                </div>
 
-                <p className="disclaimer">
-                  {explanation.disclaimer}
-                </p>
+                <p className="disclaimer">{explanation.disclaimer}</p>
               </div>
             )}
           </section>
